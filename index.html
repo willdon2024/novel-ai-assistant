@@ -97,19 +97,17 @@
         };
 
         async function verifyAuth() {
-            const authCode = document.getElementById('auth-code').value.trim();
-            const apiKey = document.getElementById('api-key').value.trim();
+            const authCode = document.getElementById('auth-code').value;
+            const apiKey = document.getElementById('api-key').value;
 
             if (!authCode || !apiKey) {
                 alert('请输入授权码和API密钥');
                 return;
             }
 
-            const button = document.querySelector('button');
-            button.disabled = true;
-            button.textContent = '验证中...';
-
             try {
+                console.log('发送验证请求:', { authCode, apiKey: '***' });  // 调试日志
+                
                 const response = await fetch('https://novel-ai-assistant.vercel.app/verify', {
                     method: 'POST',
                     headers: {
@@ -121,23 +119,28 @@
                     })
                 });
 
-                const data = await response.json();
-                console.log('验证响应:', data);
+                console.log('验证响应:', response);  // 调试日志
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || '验证失败');
+                }
 
+                const data = await response.json();
+                console.log('验证结果:', data);  // 调试日志
+                
                 if (data.success) {
-                    authInfo.authCode = authCode;
-                    authInfo.apiKey = apiKey;
+                    alert('验证成功！');
                     document.getElementById('auth-section').style.display = 'none';
                     document.getElementById('main-section').style.display = 'block';
+                    // 存储验证信息
+                    window.apiKey = apiKey;
                 } else {
                     throw new Error(data.message || '验证失败');
                 }
             } catch (error) {
-                console.error('验证错误:', error);
-                alert(error.message || '验证失败，请重试');
-            } finally {
-                button.disabled = false;
-                button.textContent = '验证';
+                console.error('验证错误:', error);  // 调试日志
+                alert('验证失败: ' + error.message);
             }
         }
 
