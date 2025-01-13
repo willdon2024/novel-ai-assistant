@@ -81,6 +81,11 @@
                 return;
             }
 
+            const button = document.getElementById('verifyAuth');
+            const originalText = button.textContent;
+            button.disabled = true;
+            button.textContent = '验证中...';
+
             try {
                 const response = await fetch('http://localhost:5000/verify', {
                     method: 'POST',
@@ -89,6 +94,11 @@
                     },
                     body: JSON.stringify({ authCode, apiKey })
                 });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || '验证失败');
+                }
 
                 const data = await response.json();
                 
@@ -104,10 +114,14 @@
                     // 保存到localStorage（可选）
                     localStorage.setItem('authInfo', JSON.stringify(authInfo));
                 } else {
-                    alert('验证失败：' + data.error);
+                    throw new Error(data.error || '验证失败');
                 }
             } catch (error) {
-                alert('验证过程出错：' + error.message);
+                console.error('验证错误:', error);
+                alert(error.message || '验证过程出错，请确保后端服务正在运行');
+            } finally {
+                button.disabled = false;
+                button.textContent = originalText;
             }
         });
 
