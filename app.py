@@ -6,7 +6,13 @@ import json
 from functools import wraps
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={
+    r"/*": {
+        "origins": ["https://willdon2024.github.io", "http://localhost:5000", "http://127.0.0.1:5000"],
+        "methods": ["GET", "POST", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization", "X-Auth-Code", "X-API-Key"]
+    }
+})
 
 # 授权码列表
 VALID_AUTH_CODES = {
