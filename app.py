@@ -45,20 +45,45 @@ def health_check():
 
 @app.route('/verify', methods=['POST'])
 def verify():
-    data = request.get_json()
-    auth_code = data.get('authCode')
-    api_key = data.get('apiKey')
-    
-    if not auth_code or not api_key:
-        return jsonify({'error': 'Missing authorization code or API key'}), 400
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No JSON data provided'}), 400
+            
+        auth_code = data.get('authCode')
+        api_key = data.get('apiKey')
         
-    if auth_code not in VALID_AUTH_CODES:
-        return jsonify({'error': 'Invalid authorization code'}), 401
-        
-    return jsonify({
-        'status': 'success',
-        'user': VALID_AUTH_CODES[auth_code]
-    })
+        if not auth_code or not api_key:
+            return jsonify({'error': 'Missing authorization code or API key'}), 400
+            
+        if auth_code not in VALID_AUTH_CODES:
+            return jsonify({'error': 'Invalid authorization code'}), 401
+            
+        # 测试 Moonshot API 密钥
+        try:
+            test_url = "https://api.moonshot.cn/v1/chat/completions"
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {api_key}"
+            }
+            test_response = requests.post(
+                test_url,
+                headers=headers,
+                json={
+                    "model": "moonshot-v1-8k",
+                    "messages": [{"role": "user", "content": "test"}],
+                }
+            )
+            test_response.raise_for_status()
+        except:
+            return jsonify({'error': 'Invalid Moonshot API key'}), 401
+            
+        return jsonify({
+            'status': 'success',
+            'user': VALID_AUTH_CODES[auth_code]
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/generate', methods=['POST'])
 @require_auth
