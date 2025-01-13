@@ -95,15 +95,15 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ authCode, apiKey })
+                    body: JSON.stringify({ 
+                        authCode: authCode,
+                        apiKey: apiKey 
+                    }),
+                    credentials: 'include'
                 });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || '验证失败');
-                }
-
                 const data = await response.json();
+                console.log('验证响应:', data);  // 添加调试日志
                 
                 if (data.success) {
                     // 保存验证信息
@@ -114,14 +114,14 @@
                     document.getElementById('authSection').classList.add('hidden');
                     document.getElementById('mainSection').classList.remove('hidden');
                     
-                    // 保存到localStorage（可选）
+                    // 保存到localStorage
                     localStorage.setItem('authInfo', JSON.stringify(authInfo));
                 } else {
                     throw new Error(data.error || '验证失败');
                 }
             } catch (error) {
                 console.error('验证错误:', error);
-                alert(error.message || '验证过程出错，请确保后端服务正在运行');
+                alert(error.message || '验证过程出错');
             } finally {
                 button.disabled = false;
                 button.textContent = originalText;
