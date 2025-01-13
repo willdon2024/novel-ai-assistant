@@ -4,14 +4,10 @@ import os
 import requests
 
 app = Flask(__name__)
-CORS(app, resources={
-    r"/*": {
-        "origins": ["https://willdon2024.github.io"],
-        "methods": ["GET", "POST", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization", "X-API-KEY"],
-        "expose_headers": ["Content-Type", "Authorization", "X-API-KEY"]
-    }
-})
+# 简化CORS配置
+CORS(app, origins=["https://willdon2024.github.io"], 
+     methods=["GET", "POST", "OPTIONS"],
+     allow_headers=["Content-Type", "Authorization", "X-API-KEY"])
 
 # 测试用的授权码
 VALID_AUTH_CODES = ["TEST001", "TEST002"]
@@ -23,76 +19,30 @@ def health():
         'auth_codes_count': len(VALID_AUTH_CODES)
     })
 
-@app.route('/verify', methods=['POST', 'OPTIONS'])
+@app.route('/verify', methods=['POST'])
 def verify():
-    # 处理 OPTIONS 请求
-    if request.method == 'OPTIONS':
-        response = jsonify({'status': 'ok'})
-        return response
-
     try:
         data = request.get_json()
-        
         if not data:
-            return jsonify({
-                'success': False,
-                'message': 'Missing request data'
-            }), 400
+            return jsonify({'success': False, 'message': '缺少请求数据'}), 400
         
         auth_code = data.get('authCode')
         api_key = data.get('apiKey')
         
         if not auth_code or not api_key:
-            return jsonify({
-                'success': False,
-                'message': 'Missing authorization code or API key'
-            }), 400
+            return jsonify({'success': False, 'message': '缺少授权码或API密钥'}), 400
         
-        # 验证授权码
         if auth_code not in VALID_AUTH_CODES:
-            return jsonify({
-                'success': False,
-                'message': 'Invalid authorization code'
-            }), 401
+            return jsonify({'success': False, 'message': '无效的授权码'}), 401
         
-        # 测试 Moonshot API 密钥 - 使用更短的超时时间
-        headers = {
-            "Authorization": f"Bearer {api_key}"
-        }
-        
-        try:
-            response = requests.post(
-                "https://api.moonshot.cn/v1/chat/completions",
-                headers=headers,
-                json={
-                    "messages": [{"role": "user", "content": "test"}],
-                    "model": "moonshot-v1-8k"
-                },
-                timeout=3  # 进一步减少超时时间到3秒
-            )
+        # 简单测试API密钥格式
+        if not api_key.startswith('ms-'):
+            return jsonify({'success': False, 'message': '无效的API密钥格式'}), 401
             
-            if response.status_code != 200:
-                return jsonify({
-                    'success': False,
-                    'message': 'Invalid API key'
-                }), 401
-                
-        except requests.exceptions.RequestException as e:
-            return jsonify({
-                'success': False,
-                'message': 'API key verification timeout'
-            }), 500
-            
-        return jsonify({
-            'success': True,
-            'message': 'Verification successful'
-        })
+        return jsonify({'success': True, 'message': '验证成功'})
         
     except Exception as e:
-        return jsonify({
-            'success': False,
-            'message': f'Verification error: {str(e)}'
-        }), 500
+        return jsonify({'success': False, 'message': f'验证错误: {str(e)}'}), 500
 
 @app.route('/generate', methods=['POST'])
 def generate():
