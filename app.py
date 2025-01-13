@@ -46,21 +46,30 @@ def health_check():
 @app.route('/verify', methods=['POST'])
 def verify():
     try:
+        print("收到验证请求")  # 调试日志
         data = request.get_json()
+        print(f"请求数据: {data}")  # 调试日志
+        
         if not data:
+            print("没有收到JSON数据")  # 调试日志
             return jsonify({'error': 'No JSON data provided'}), 400
             
         auth_code = data.get('authCode')
         api_key = data.get('apiKey')
+        print(f"授权码: {auth_code}")  # 调试日志
+        print(f"API密钥前6位: {api_key[:6] if api_key else None}")  # 调试日志
         
         if not auth_code or not api_key:
+            print("缺少授权码或API密钥")  # 调试日志
             return jsonify({'error': 'Missing authorization code or API key'}), 400
             
         if auth_code not in VALID_AUTH_CODES:
+            print(f"无效的授权码，有效授权码列表: {list(VALID_AUTH_CODES.keys())}")  # 调试日志
             return jsonify({'error': 'Invalid authorization code'}), 401
             
         # 测试 Moonshot API 密钥
         try:
+            print("开始测试 Moonshot API 密钥")  # 调试日志
             test_url = "https://api.moonshot.cn/v1/chat/completions"
             headers = {
                 "Content-Type": "application/json",
@@ -74,15 +83,20 @@ def verify():
                     "messages": [{"role": "user", "content": "test"}],
                 }
             )
+            print(f"Moonshot API 响应状态码: {test_response.status_code}")  # 调试日志
             test_response.raise_for_status()
-        except:
+            print("Moonshot API 测试成功")  # 调试日志
+        except Exception as e:
+            print(f"Moonshot API 测试失败: {str(e)}")  # 调试日志
             return jsonify({'error': 'Invalid Moonshot API key'}), 401
             
+        print("验证成功")  # 调试日志
         return jsonify({
             'status': 'success',
             'user': VALID_AUTH_CODES[auth_code]
         })
     except Exception as e:
+        print(f"发生错误: {str(e)}")  # 调试日志
         return jsonify({'error': str(e)}), 500
 
 @app.route('/generate', methods=['POST'])
