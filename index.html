@@ -87,7 +87,7 @@
             button.textContent = '验证中...';
 
             try {
-                const response = await fetch('http://localhost:5000/verify', {
+                const response = await fetch('https://willdon2024.pythonanywhere.com/verify', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -146,7 +146,7 @@
             result.classList.add('hidden');
 
             try {
-                const response = await fetch('http://localhost:5000/generate', {
+                const response = await fetch('https://willdon2024.pythonanywhere.com/generate', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
