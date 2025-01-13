@@ -14,8 +14,8 @@
 
 1. 克隆仓库：
 ```bash
-git clone https://github.com/你的用户名/天才小说家.git
-cd 天才小说家
+git clone https://github.com/willdon2024/novel-ai-assistant.git
+cd novel-ai-assistant
 ```
 
 2. 安装依赖：
