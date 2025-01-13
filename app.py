@@ -8,9 +8,11 @@ from functools import wraps
 app = Flask(__name__)
 CORS(app, resources={
     r"/*": {
-        "origins": "*",
+        "origins": ["https://willdon2024.github.io", "http://localhost:5000", "http://127.0.0.1:5000"],
         "methods": ["GET", "POST", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization", "X-Auth-Code", "X-API-Key"]
+        "allow_headers": ["Content-Type", "Authorization", "X-API-KEY"],
+        "expose_headers": ["Content-Type", "Authorization", "X-API-KEY"],
+        "supports_credentials": True
     }
 })
 

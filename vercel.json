@@ -1,0 +1,26 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "app.py",
+            "use": "@vercel/python"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "app.py",
+            "methods": ["GET", "POST", "OPTIONS"],
+            "headers": {
+                "Access-Control-Allow-Origin": "https://willdon2024.github.io",
+                "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type, Authorization, X-API-KEY",
+                "Access-Control-Expose-Headers": "Content-Type, Authorization, X-API-KEY",
+                "Access-Control-Allow-Credentials": "true"
+            }
+        }
+    ],
+    "env": {
+        "PYTHONPATH": "."
+    }
+} 
