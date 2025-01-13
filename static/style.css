@@ -1,0 +1,64 @@
+body {
+    font-family: 'Noto Sans SC', sans-serif;
+}
+
+.prose {
+    line-height: 1.8;
+    color: #374151;
+}
+
+.prose p {
+    margin-bottom: 1.5em;
+}
+
+/* 自定义滚动条样式 */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* 输入框聚焦时的动画效果 */
+input:focus {
+    transition: all 0.2s ease-in-out;
+    box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.2);
+}
+
+/* 按钮悬停效果 */
+button:hover {
+    transform: translateY(-1px);
+}
+
+/* 结果卡片的渐变边框效果 */
+#result {
+    position: relative;
+}
+
+#result::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #8b5cf6, #6366f1);
+    border-radius: 0.5rem;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#result:not(.hidden)::before {
+    opacity: 0.1;
+} 

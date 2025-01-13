@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天才小说家 - AI小说创作助手</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <header class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-6">
+            <div class="container mx-auto px-4">
+                <h1 class="text-3xl font-bold text-center">天才小说家</h1>
+                <p class="text-center mt-2 text-gray-200">AI驱动的小说创作助手</p>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-4 py-8">
+            <div class="max-w-3xl mx-auto">
+                <div class="bg-white rounded-lg shadow-lg p-6">
+                    <div class="mb-6">
+                        <label for="title" class="block text-gray-700 font-medium mb-2">输入小说标题</label>
+                        <input type="text" id="title" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500" placeholder="请输入小说标题...">
+                    </div>
+                    <button id="generate" class="w-full bg-purple-600 text-white py-2 px-4 rounded-md hover:bg-purple-700 transition duration-200 flex items-center justify-center">
+                        <span id="buttonText">生成故事框架</span>
+                        <div id="loading" class="hidden">
+                            <svg class="animate-spin ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </div>
+                    </button>
+                </div>
+
+                <div id="result" class="mt-8 bg-white rounded-lg shadow-lg p-6 hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">故事构思</h2>
+                    <div id="content" class="prose max-w-none">
+                        <!-- 结果将在这里显示 -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.getElementById('generate').addEventListener('click', async () => {
+            const title = document.getElementById('title').value.trim();
+            if (!title) {
+                alert('请输入小说标题');
+                return;
+            }
+
+            const button = document.getElementById('generate');
+            const buttonText = document.getElementById('buttonText');
+            const loading = document.getElementById('loading');
+            const result = document.getElementById('result');
+            const content = document.getElementById('content');
+
+            // 显示加载状态
+            button.disabled = true;
+            buttonText.textContent = '正在生成...';
+            loading.classList.remove('hidden');
+            result.classList.add('hidden');
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ title }),
+                });
+
+                const data = await response.json();
+                
+                if (data.success) {
+                    content.innerHTML = data.result.replace(/\n/g, '<br>');
+                    result.classList.remove('hidden');
+                } else {
+                    alert('生成失败：' + data.error);
+                }
+            } catch (error) {
+                alert('发生错误：' + error.message);
+            } finally {
+                button.disabled = false;
+                buttonText.textContent = '生成故事框架';
+                loading.classList.add('hidden');
+            }
+        });
+    </script>
+</body>
+</html> 
